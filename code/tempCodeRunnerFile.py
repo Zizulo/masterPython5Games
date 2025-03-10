@@ -1,1 +1,1 @@
-#ff0055
+lf.frame_index) % len(self.frame
