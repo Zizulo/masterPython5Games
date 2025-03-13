@@ -95,13 +95,16 @@ class AnimatedExplosion(pygame.sprite.Sprite):
             self.kill()
 
 def collision():
-    global running
+    global killed
+    global game_active
 
     collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True, pygame.sprite.collide_mask)
     if collision_sprites:
+        player.kill()
+        killed = True
+        game_active = False
+        AnimatedExplosion(explosion_frames, player.rect.center, all_sprites)
         damage_sound.play()
-        time.sleep(2)
-        running = False
 
     for laser in laser_sprites:
         collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
@@ -110,22 +113,25 @@ def collision():
             AnimatedExplosion(explosion_frames, laser.rect.midtop, all_sprites)
             explosion_sound.play()
 
-def display_score():
-    current_time = pygame.time.get_ticks() // 100
-    text_surf = font.render(str(current_time), True, '#ff0055')
+def display_score(c_time):
+    text_surf = font.render(str(c_time), True, '#ff0055')
     text_rect = text_surf.get_frect(midbottom = (WINDOW_WIDTH/2, WINDOW_HEIGHT - 50))
     pygame.draw.rect(display_surface, 'red', text_rect.inflate(20, 10).move(0, -8), 5, 10)
     display_surface.blit(text_surf, text_rect)
 
 def display_start():
-    # display start
-    display_surface.fill((0, 0, 0))
     start_surf = font.render('START', True, '#ff0055')
     start_rect = start_surf.get_frect(center = (WINDOW_WIDTH/2, WINDOW_HEIGHT - 50))
     pygame.draw.rect(display_surface, 'red', start_rect.inflate(20, 10).move(0, -8), 5, 10)
     display_surface.blit(start_surf, start_rect)
 
     return start_rect
+
+def game_over():
+    text_surf = font.render("GAME OVER", True, '#ff0055')
+    text_rect = text_surf.get_frect(midbottom = (WINDOW_WIDTH/2, WINDOW_HEIGHT/2))
+    pygame.draw.rect(display_surface, 'red', text_rect.inflate(20, 10).move(0, -8), 5, 10)
+    display_surface.blit(text_surf, text_rect)
 
 # general setup
 pygame.init()
@@ -136,6 +142,7 @@ icon = pygame.image.load(join("5games-main", "space shooter", "images", "player.
 pygame.display.set_icon(icon)
 running = True
 game_active = False
+killed = False
 clock = pygame.time.Clock()
 
 # import
@@ -170,27 +177,37 @@ pygame.time.set_timer(meteor_event, 500)
 
 
 while running:
-
-    dt = clock.tick() / 300
+    dt = 0
 
     if not game_active:
-        start_button = display_start()
-        pygame.display.update()
+        start_btn = display_start()
+        player.can_shoot = False
 
-        #event loop
+        if killed:
+            game_over()
+            all_sprites.empty()
+            all_sprites = pygame.sprite.Group()
+            meteor_sprites = pygame.sprite.Group()
+            laser_sprites = pygame.sprite.Group()
+            for i in range(20):
+                Star(all_sprites, star_surf)  
+            player = Player(all_sprites)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
+            if event.type == pygame.MOUSEBUTTONDOWN and start_btn.collidepoint(event.pos):
                 game_active = True
-                all_sprites.empty()
-                meteor_sprites.empty()
-                laser_sprites.empty()
-                player = Player(all_sprites)
-                for i in range(20):
-                    Star(all_sprites, star_surf)
+                killed = False
+                start_time = pygame.time.get_ticks()
+                
+        pygame.display.update()      
     else:
+        dt = clock.tick() / 300
+        player.can_shoot = True
+        current_time = (pygame.time.get_ticks() - start_time) // 100
 
+        #event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -201,13 +218,12 @@ while running:
         #update
         all_sprites.update(dt)
         collision()
-
-        #draw the game
-        display_surface.fill('#3a2e3f')
-        all_sprites.draw(display_surface)
-        display_score()
-        display_start()
+        display_score(current_time)
 
         pygame.display.update()
+
+    #draw the game
+    display_surface.fill('#3a2e3f')
+    all_sprites.draw(display_surface)
 
 pygame.quit()

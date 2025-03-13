@@ -1,1 +1,2 @@
-lf.frame_index) % len(self.frame
+                meteor_sprites = pygame.sprite.Group()
+                laser_sprites = pygame.sprite.Group()
