@@ -1,2 +1,2 @@
-                meteor_sprites = pygame.sprite.Group()
-                laser_sprites = pygame.sprite.Group()
+    game_active = False
+            killed = True

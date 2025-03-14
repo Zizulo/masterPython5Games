@@ -91,7 +91,7 @@ class AnimatedExplosion(pygame.sprite.Sprite):
         self.frame_index += 20 * dt
         if self.frame_index < len(self.frames):
             self.image = self.frames[int(self.frame_index)]
-        else:
+        else:  
             self.kill()
 
 def collision():
@@ -101,10 +101,10 @@ def collision():
     collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True, pygame.sprite.collide_mask)
     if collision_sprites:
         player.kill()
-        killed = True
-        game_active = False
-        AnimatedExplosion(explosion_frames, player.rect.center, all_sprites)
+        animation = AnimatedExplosion(explosion_frames, player.rect.center, all_sprites)
         damage_sound.play()
+        game_active = False
+        killed = True
 
     for laser in laser_sprites:
         collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
@@ -155,11 +155,10 @@ font = pygame.font.Font(join('5games-main', 'space shooter', 'images', 'Oxanium-
 laser_sound = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "laser.wav"))
 laser_sound.set_volume(0.5)
 explosion_sound = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "explosion.wav"))
-explosion_sound.set_volume(0.5)
 damage_sound = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "damage.ogg"))
 game_music = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "game_music.wav"))
 game_music.set_volume(0.5)
-game_music.play()
+game_music.play(5)
 
 # sprites
 all_sprites = pygame.sprite.Group()
