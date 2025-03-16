@@ -101,7 +101,7 @@ def collision():
     collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True, pygame.sprite.collide_mask)
     if collision_sprites:
         player.kill()
-        animation = AnimatedExplosion(explosion_frames, player.rect.center, all_sprites)
+        AnimatedExplosion(explosion_frames, player.rect.center, all_sprites)
         damage_sound.play()
         game_active = False
         killed = True
@@ -174,24 +174,22 @@ player = Player(all_sprites)
 meteor_event = pygame.event.custom_type()
 pygame.time.set_timer(meteor_event, 500)
 
-
 while running:
     dt = 0
 
     if not game_active:
         start_btn = display_start()
         player.can_shoot = False
-
+        
         if killed:
             game_over()
             all_sprites.empty()
             all_sprites = pygame.sprite.Group()
             meteor_sprites = pygame.sprite.Group()
-            laser_sprites = pygame.sprite.Group()
-            for i in range(20):
-                Star(all_sprites, star_surf)  
             player = Player(all_sprites)
-
+            for i in range(20):
+                Star(all_sprites, star_surf)                 
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
