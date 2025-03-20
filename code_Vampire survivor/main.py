@@ -4,6 +4,7 @@ from sprites import *
 from random import randint
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
+from enemies import Enemies
 
 class Game:
     def __init__(self):
@@ -60,6 +61,7 @@ class Game:
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
                 self.gun = Gun(self.player, self.all_sprites)
+                self.enemies = Enemies((obj.x, obj.y), self.all_sprites, self.collision_sprites)             
 
     def run(self):
         while self.running:
