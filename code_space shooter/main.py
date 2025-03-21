@@ -158,7 +158,7 @@ explosion_sound = pygame.mixer.Sound(join("5games-main", "space shooter", "audio
 damage_sound = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "damage.ogg"))
 game_music = pygame.mixer.Sound(join("5games-main", "space shooter", "audio", "game_music.wav"))
 game_music.set_volume(0.5)
-game_music.play(5)
+game_music.play(loops= -1)
 
 # sprites
 all_sprites = pygame.sprite.Group()
