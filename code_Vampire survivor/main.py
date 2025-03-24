@@ -14,6 +14,8 @@ class Game:
         pygame.display.set_icon(pygame.image.load(join('5games-main', 'Vampire survivor', 'images', 'enemies', 'bat', '0.png')).convert_alpha())
         self.clock = pygame.time.Clock()
         self.running = True
+        self.dead = False
+        self.lifes = 3
 
         # groups
         self.all_sprites = AllSprites()
@@ -30,6 +32,9 @@ class Game:
         self.enemy_event = pygame.event.custom_type()
         pygame.time.set_timer(self.enemy_event, 150)
         self.spawn_positions = []
+
+        # font
+        self.font = pygame.font.Font(join('5games-main', 'Vampire survivor', 'images', 'Oxanium-Bold.ttf'), 40)
         
         # audio
         self.shoot_sound = pygame.mixer.Sound(join('5games-main', 'Vampire survivor', 'audio', 'shoot.wav'))
@@ -43,11 +48,25 @@ class Game:
         self.load_images()
         self.setup()
     
+    def load_life(self, life):
+        self.life = life
+        self.life_surf = self.font.render(f'LIFES: {self.life}', True, '#ff0055')
+        self.life_rect = self.life_surf.get_frect(topleft = (15, 20))
+        pygame.draw.rect(self.display_surface, 'red', self.life_rect.inflate(20, 10).move(0, -8), 5, 10)
+        self.display_surface.blit(self.life_surf, self.life_rect)
+    
+    def lifes_change(self):
+        self.lifes = 3
+
+        if self.life > 0:
+            self.lifes -= 1
+        
+        return self.lifes
+    
     def load_images(self):
         self.bullet_surf = pygame.image.load(join('5games-main', 'Vampire survivor', 'images', 'gun', 'bullet.png')).convert_alpha()
 
         folders = list(walk(join('5games-main', 'Vampire survivor', 'images', 'enemies')))[0][1]
-        print(folders)
         self.enemy_frames = {}
         for folder in folders:
             for folder_path, _, file_names in walk(join('5games-main', 'Vampire survivor', 'images', 'enemies', folder)):
@@ -102,12 +121,17 @@ class Game:
 
     def player_collision(self):
         if pygame.sprite.spritecollide(self.player, self.enemy_sprites, False, pygame.sprite.collide_mask):
-            self.running = False
+            self.lifes = self.lifes_change()
+            self.dead = True
+            # self.running = False
 
     def run(self):
         while self.running:
             # dt
             dt = self.clock.tick() / 1000
+
+            if self.dead:
+                dt = 0
 
             # event loop
             for event in pygame.event.get():
@@ -126,9 +150,11 @@ class Game:
             # draw
             self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
+
+            # load health bar
+            self.load_life(self.lifes)
+
             pygame.display.update()
-        
-        pygame.quit()
 
 if __name__ == '__main__':
     game = Game()
