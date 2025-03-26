@@ -55,11 +55,20 @@ class Game:
         pygame.draw.rect(self.display_surface, 'red', self.life_rect.inflate(20, 10).move(0, -8), 5, 10)
         self.display_surface.blit(self.life_surf, self.life_rect)
     
+    def load_restart(self):
+        self.restart_surf = self.font.render("RESTART", True, '#ff0055')
+        self.restart_rect = self.restart_surf.get_frect(center = (WINDOW_WIDTH/2, WINDOW_HEIGHT/2))
+        pygame.draw.rect(self.display_surface, 'red', self.restart_rect.inflate(20, 10).move(0, -8), 5, 10)
+        self.display_surface.blit(self.restart_surf, self.restart_rect)
+        pygame.display.update()
+    
     def lifes_change(self):
         self.lifes = 3
+        self.life = 3
 
         if self.life > 0:
             self.lifes -= 1
+            self.life -= 1
         
         return self.lifes
     
@@ -128,10 +137,11 @@ class Game:
     def run(self):
         while self.running:
             # dt
-            dt = self.clock.tick() / 1000
+            dt = 0
 
             if self.dead:
-                dt = 0
+                self.load_restart()
+                pygame.display.update()
 
             # event loop
             for event in pygame.event.get():
@@ -140,12 +150,18 @@ class Game:
                 if event.type == self.enemy_event:
                     Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
             
-            # update
-            self.gun_timer()
-            self.input()
-            self.all_sprites.update(dt)
-            self.bullet_collision()
-            self.player_collision()
+            else:
+                dt = self.clock.tick() / 1000
+
+                for event in pygame.event.get():
+                    if event.type == self.enemy_event:
+                        Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
+                # update
+                self.gun_timer()
+                self.input()
+                self.all_sprites.update(dt)
+                self.bullet_collision()
+                self.player_collision()
 
             # draw
             self.display_surface.fill('black')

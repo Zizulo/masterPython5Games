@@ -1,8 +1,2 @@
-# draw
-            self.display_surface.fill('black')
-            self.all_sprites.draw(self.player.rect.center)
-
-            # load health bar
-            self.load_life(self.lifes)
-
-            pygame.display.update()
+if event.type == self.enemy_event:
+                    Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
